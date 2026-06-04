@@ -1,0 +1,372 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+
+    font-family:'Poppins',sans-serif;
+
+    background:#f8fafc;
+
+    color:#1e293b;
+}
+
+.app-layout{
+
+    display:flex;
+
+    height:calc(100vh - 56px);
+}
+
+.sidebar{
+
+    width:280px;
+
+    background:white;
+
+    border-right:1px solid #e5e7eb;
+
+    padding:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    flex-shrink:0;
+}
+
+.sidebar h2{
+
+    margin-bottom:20px;
+
+    font-size:22px;
+
+    color:#1e293b;
+}
+
+.doc-list{
+
+    flex:1;
+
+    overflow-y:auto;
+}
+
+.doc-item{
+
+    background:#f1f5f9;
+
+    padding:12px;
+
+    border-radius:10px;
+
+    margin-bottom:10px;
+
+    cursor:pointer;
+
+    transition:0.2s;
+}
+
+.doc-item:hover{
+
+    background:#dbeafe;
+}
+
+.doc-item:hover{
+
+    background:#334155;
+}
+
+.main-chat{
+
+    flex:1;
+
+    padding:20px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:hidden;
+}
+
+.chat-wrapper{
+
+    max-width:1000px;
+
+    margin:30px auto;
+
+    padding:20px;
+}
+
+.chat-header{
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:16px;
+
+    text-align:center;
+
+    box-shadow:
+    0 4px 12px rgba(0,0,0,0.08);
+
+    margin-bottom:20px;
+}
+
+.chat-header h1{
+
+    margin-bottom:8px;
+}
+
+.chat-header p{
+
+    color:#64748b;
+}
+
+.chat-container{
+
+    background:white;
+
+    flex:1;
+
+    overflow-y:auto;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    box-shadow:
+    0 4px 12px rgba(0,0,0,0.08);
+
+    margin-bottom:15px;
+}
+
+.message{
+
+    display:flex;
+
+    margin:15px 0;
+
+    animation:fadeIn .25s ease;
+}
+
+.user{
+
+    justify-content:flex-end;
+}
+
+.bot{
+
+    justify-content:flex-start;
+}
+
+.bubble{
+
+    max-width:70%;
+
+    padding:14px 18px;
+
+    border-radius:18px;
+
+    line-height:1.6;
+
+    word-wrap:break-word;
+}
+
+.user .bubble{
+
+    background:#2563eb;
+
+    color:white;
+
+    border-bottom-right-radius:6px;
+}
+
+.bot .bubble{
+
+    background:#e2e8f0;
+
+    color:#1e293b;
+
+    border-bottom-left-radius:6px;
+}
+
+.input-area{
+
+    display:flex;
+
+    gap:10px;
+
+    margin-top:20px;
+}
+
+.input-area input{
+
+    flex:1;
+
+    padding:14px;
+
+    border:1px solid #cbd5e1;
+
+    border-radius:10px;
+
+    font-size:15px;
+
+    outline:none;
+}
+
+.input-area input:focus{
+
+    border-color:#2563eb;
+}
+
+.input-area button{
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    padding:14px 22px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    transition:.2s;
+}
+
+.input-area button:hover{
+
+    background:#1d4ed8;
+}
+
+.typing-indicator{
+
+    display:none;
+
+    margin-top:15px;
+}
+
+.typing-bubble{
+
+    background:#e2e8f0;
+
+    border-radius:18px;
+
+    padding:12px 16px;
+
+    display:inline-flex;
+
+    gap:6px;
+
+    align-items:center;
+}
+
+.typing-bubble span{
+
+    width:8px;
+
+    height:8px;
+
+    background:#666;
+
+    border-radius:50%;
+
+    animation:bounce 1.4s infinite;
+}
+
+.typing-bubble span:nth-child(2){
+
+    animation-delay:.2s;
+}
+
+.typing-bubble span:nth-child(3){
+
+    animation-delay:.4s;
+}
+
+.footer-actions{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:20px;
+}
+
+.clear-btn{
+
+    background:#dc2626;
+
+    color:white;
+
+    border:none;
+
+    padding:10px 16px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+}
+
+.clear-btn:hover{
+
+    background:#b91c1c;
+}
+
+.footer-actions a{
+
+    text-decoration:none;
+
+    color:#2563eb;
+
+    font-weight:500;
+}
+
+.footer-actions a:hover{
+
+    text-decoration:underline;
+}
+
+@keyframes bounce{
+
+    0%,80%,100%{
+
+        transform:translateY(0);
+    }
+
+    40%{
+
+        transform:translateY(-5px);
+    }
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(10px);
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+    }
+}
+.navbar{
+
+    height:56px;
+}
