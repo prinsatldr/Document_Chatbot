@@ -7,6 +7,17 @@ from ollama import chat
 from sentence_transformers import SentenceTransformer
 import faiss
 import numpy as np
+from flask import flash, redirect,url_for
+from flask import jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+app.secret_key = "chatbot_secret_key"
+CORS(app)
+
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "admin123"
+
 
 model = SentenceTransformer(
     "all-MiniLM-L6-v2"
@@ -15,9 +26,6 @@ model = SentenceTransformer(
 index = faiss.IndexFlatL2(384)
 
 chunk_store = []
-
-app = Flask(__name__)
-app.secret_key = "chatbot_secret_key"
 
 UPLOAD_FOLDER = "uploads"
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -108,7 +116,7 @@ def save_chunks(filename, chunks):
     conn.commit()
     conn.close()
 
-def search_chunks(question, top_k=5):
+def search_chunks(question, top_k=3):
 
     question_embedding = model.encode(
         [question]
@@ -142,7 +150,7 @@ def search_chunks(question, top_k=5):
 
 def get_ai_answer(question, document_text, chat_history):
 
-    document_text = document_text[:5000]
+    document_text = document_text[:1500]
 
     conversation = ""
 
@@ -178,11 +186,59 @@ Question:
 
     return response["message"]["content"]
 
-
 @app.route("/")
+def root():
+
+    return redirect(
+        "/chat"
+    )
+
+@app.route("/login")
+def login_page():
+
+    return render_template(
+        "login.html"
+    )
+
+@app.route(
+    "/login",
+    methods=["POST"]
+)
+def login():
+
+    username = request.form["username"]
+
+    password = request.form["password"]
+
+    if (
+        username == ADMIN_USERNAME
+        and
+        password == ADMIN_PASSWORD
+    ):
+
+        session["admin"] = True
+
+        return redirect("/admin")
+
+    flash(
+        "Invalid username or password!"
+    )
+
+    return redirect("/login")
+
+@app.route("/admin")
 def home():
 
+    if not session.get(
+        "admin"
+    ):
+
+        return redirect(
+            "/login"
+        )
+
     conn = get_db_connection()
+
     cursor = conn.cursor()
 
     cursor.execute("""
@@ -198,8 +254,19 @@ def home():
     return render_template(
         "upload.html",
         documents=documents
-)
+    )
 
+@app.route("/logout")
+def logout():
+
+    session.pop(
+        "admin",
+        None
+    )
+
+    return redirect(
+        "/login"
+    )
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -245,7 +312,8 @@ def upload():
         chunks
     )
 
-    return f"{file.filename} uploaded and indexed successfully!"
+    flash("PDF uploaded successfully!")
+    return redirect("/admin")
 
 
 @app.route("/chat")
@@ -274,7 +342,10 @@ def chatbot():
     )
 
 
-@app.route("/search", methods=["POST"])
+@app.route(
+    "/search",
+    methods=["POST"]
+)
 def search():
 
     question = request.form["question"]
@@ -307,7 +378,10 @@ def search():
         if question.lower() in followups:
 
             search_query = (
-                session.get("last_topic", "")
+                session.get(
+                    "last_topic",
+                    ""
+                )
                 + " "
                 + question
             )
@@ -315,6 +389,7 @@ def search():
         else:
 
             session["last_topic"] = question
+
             search_query = question
 
         document_text, score = search_chunks(
@@ -351,24 +426,11 @@ def search():
 
     session["chat_history"] = chat_history[-10:]
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("""
-        SELECT id, filename
-        FROM documents
-        ORDER BY id DESC
-    """)
-
-    documents = cursor.fetchall()
-
-    conn.close()
-
-    return render_template(
-        "chat.html",
-        chat_history=chat_history,
-        documents=documents
-)
+    return jsonify(
+        {
+            "answer": answer
+        }
+    )
 
 
 @app.route("/delete/<int:doc_id>")
@@ -411,7 +473,7 @@ def delete_document(doc_id):
 
     conn.close()
 
-    return redirect("/")
+    return redirect("/admin")
 
 @app.route(
     "/clear_chat",
@@ -431,6 +493,59 @@ def clear_chat():
 
     return redirect(
         "/chat"
+    )
+
+@app.route(
+    "/auto_logout",
+    methods=["POST"]
+)
+def auto_logout():
+
+    session.pop(
+        "admin",
+        None
+    )
+
+    return "", 204
+
+from flask import jsonify
+
+@app.route(
+    "/api/chat",
+    methods=["POST"]
+)
+def api_chat():
+
+    question = request.form["question"]
+
+    if index.ntotal == 0:
+
+        answer = "No document uploaded."
+
+    else:
+
+        document_text, score = search_chunks(
+            question
+        )
+
+        if score > 3:
+
+            answer = (
+                "Sorry, I couldn't find relevant information."
+            )
+
+        else:
+
+            answer = get_ai_answer(
+                question,
+                document_text,
+                []
+            )
+
+    return jsonify(
+        {
+            "answer": answer
+        }
     )
 
 @app.route("/uploads/<filename>")
