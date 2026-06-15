@@ -129,24 +129,26 @@ body{
 
     display:flex;
 
-    gap:10px;
+    align-items:center;
 
-    margin-top:20px;
+    gap:8px;
+
+    margin-top:15px;
 }
 
 .input-area input{
 
     flex:1;
 
-    padding:14px;
+    height:50px;
+
+    padding:0 15px;
 
     border:1px solid #cbd5e1;
 
-    border-radius:10px;
+    border-radius:12px;
 
     font-size:15px;
-
-    outline:none;
 }
 
 .input-area input:focus{
@@ -156,19 +158,19 @@ body{
 
 .input-area button{
 
+    height:50px;
+
+    padding:0 18px;
+
+    border:none;
+
+    border-radius:12px;
+
     background:#2563eb;
 
     color:white;
 
-    border:none;
-
-    padding:14px 22px;
-
-    border-radius:10px;
-
     cursor:pointer;
-
-    transition:.2s;
 }
 
 .input-area button:hover{
@@ -437,4 +439,58 @@ body{
 
     }
 
+}
+
+#startRecord,
+#stopRecord{
+
+    width:50px;
+    height:50px;
+
+    min-width:50px;
+
+    border:none;
+
+    border-radius:12px;
+
+    font-size:18px;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+}
+
+.recording{
+    animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.1);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
+}
+
+.btn-danger{
+
+    width:140px;
+
+    display:block;
+
+    margin:10px auto 0;
+
+    border-radius:12px;
 }

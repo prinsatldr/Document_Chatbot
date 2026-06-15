@@ -10,13 +10,20 @@ import numpy as np
 from flask import flash, redirect,url_for
 from flask import jsonify
 from flask_cors import CORS
+import whisper
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+whisper_model = whisper.load_model("base")
 
 app = Flask(__name__)
-app.secret_key = "chatbot_secret_key"
+app.secret_key = os.getenv("SECRET_KEY")
 CORS(app)
 
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "admin123"
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
 
 
 model = SentenceTransformer(
@@ -36,10 +43,11 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 def get_db_connection():
     return pymysql.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="chatbot_db"
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME"),
+        port=int(os.getenv("DB_PORT"))
     )
 
 
@@ -593,6 +601,42 @@ def load_existing_chunks():
     print(
         f"Loaded {len(all_chunks)} chunks into FAISS."
     )
+
+@app.route("/voice", methods=["POST"])
+def voice():
+        audio = request.files["audio"]
+
+        audio.save("recording.webm")
+
+        result = whisper_model.transcribe(
+            "recording.webm"
+        )
+
+        question = result["text"]
+
+        document_text, score = search_chunks(
+            question
+        )
+
+        if score > 3:
+
+            answer = (
+                "Sorry, I couldn't find relevant information."
+            )
+
+        else:
+
+            answer = get_ai_answer(
+                question,
+                document_text,
+                []
+            )
+
+        return jsonify({
+            "transcript": question,
+            "answer": answer
+    })
+
 if __name__ == "__main__":
 
     load_existing_chunks()
